@@ -1,0 +1,49 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+void printBIN(char *str)
+{
+  int i=0;
+  while(str[i]!=0)
+    printf("%d ",(int)str[i++]);
+  printf("\n");
+}
+
+int main (int argc, char *args []) {
+
+  char c;
+  int epuck = open("/dev/rfcomm0", O_RDWR | O_NOCTTY);
+  char str[3]="N\n\n";
+  if(argc>1)
+    str[0]=args[1][0];
+  else
+    {
+      str[0]=-'E';
+      str[1]=0;//-'E';
+      str[2]=0x00;
+    }
+  
+  char rep[1000];
+  while (1)
+    {
+      printf("%c",0x08);
+      int n = write(epuck,str,3);
+      printf("Sent %d bytes :", n);
+      printf("%s\n",str);
+      sleep(1);
+      n = read(epuck, rep, 1000);
+      printf("Received %d bytes :", n);
+      printBIN(rep);
+      // printf("%s\n",rep);
+      sleep(1);
+    }
+
+  close(epuck);
+
+  return 0;
+}
+
+
+  

@@ -29,10 +29,26 @@ void printSHORT(char *str,int n)
   printf("\n");
 }
 
+int init_connection(const char *path)
+{
+	int i,fd = open(path, O_RDWR | O_NOCTTY);
+	if(fd < 0)
+	{
+		printf("couldn't connect ...\n");
+		for(i=0;i<3;i++,sleep(1))
+		{
+			if((fd = open(path, O_RDWR | O_NOCTTY))>-1)
+				return fd;
+			printf("couldn't connect ...\n");
+		}
+	}
+	return fd;
+}
+
 int main (int argc, char *args []) {
 
   char c;
-  int epuck = open("/dev/rfcomm0", O_RDWR | O_NOCTTY);
+  int epuck = init_connection("/dev/rfcomm0");
   char str[9]="N\n\0";
   int i=0;
 
